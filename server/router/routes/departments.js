@@ -1,0 +1,23 @@
+module.exports = (app, db) => {
+    // GET all departments
+    app.get('/departments', (req, res) => {
+        db.department.findAll({
+            attributes: ['id', 'depName']
+        })
+            .then(departments => {
+                res.send(departments);
+            });
+    });
+    // GET single employee by id
+    app.get('/departments/:id', (req, res) => {
+        let depId = req.params.id;
+        db.department.find({
+            where: {
+                id: depId
+            }
+        })
+            .then(department => {
+                res.json(department);
+            });
+    });
+};
