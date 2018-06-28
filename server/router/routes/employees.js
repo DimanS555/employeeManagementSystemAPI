@@ -1,6 +1,6 @@
 const { check, validationResult } = require('express-validator/check');
 
-module.exports = (app, db, checkIfAuthenticated) => {
+module.exports = (app, db, checkIfAuthenticated, jwtAuthz) => {
     // GET all employees
     app.get('/employees', checkIfAuthenticated, (req, res) => {
         let pageNo = parseInt(req.query.pageNo, 10);
@@ -38,74 +38,86 @@ module.exports = (app, db, checkIfAuthenticated) => {
     });
 
     // POST single employee
-    app.post('/employees', checkIfAuthenticated,[
-        check('firstName').exists().isAlpha(),
-        check('lastName').exists().isAlpha(),
-        check('emp_depID').isInt()
-    ], (req, res) => {
-        const errors = validationResult(req);
+    app.post('/employees', checkIfAuthenticated, jwtAuthz([
+        'create:employees',
+        'delete:employees',
+        'edit:employees'
+    ]), [
+            check('firstName').exists().isAlpha(),
+            check('lastName').exists().isAlpha(),
+            check('emp_depID').isInt()
+        ], (req, res) => {
+            const errors = validationResult(req);
 
-        if (!errors.isEmpty()) {
-            return res.status(422).json({ errors: errors.array() });
-        }
+            if (!errors.isEmpty()) {
+                return res.status(422).json({ errors: errors.array() });
+            }
 
-        let firstName = req.body.firstName;
-        let lastName = req.body.lastName;
-        let isActive = req.body.isActive;
-        let emp_depID = req.body.emp_depID;
-        if (!isActive) {
-            isActive = 0;
-        }
-        db.employee.create({
-            firstName: firstName,
-            lastName: lastName,
-            isActive: isActive,
-            emp_depID: emp_depID
-        })
-            .then(newEmployee => {
-                res.json(newEmployee);
-            });
-    });
+            let firstName = req.body.firstName;
+            let lastName = req.body.lastName;
+            let isActive = req.body.isActive;
+            let emp_depID = req.body.emp_depID;
+            if (!isActive) {
+                isActive = 0;
+            }
+            db.employee.create({
+                firstName: firstName,
+                lastName: lastName,
+                isActive: isActive,
+                emp_depID: emp_depID
+            })
+                .then(newEmployee => {
+                    res.json(newEmployee);
+                });
+        });
 
     // PUT single employee
-    app.put('/employees/:id', checkIfAuthenticated, [
-        check('firstName').exists().isAlpha(),
-        check('lastName').exists().isAlpha(),
-        check('emp_depID').isInt()
-    ], (req, res) => {
-        const errors = validationResult(req);
+    app.put('/employees/:id', checkIfAuthenticated, jwtAuthz([
+        'create:employees',
+        'delete:employees',
+        'edit:employees'
+    ]), [
+            check('firstName').exists().isAlpha(),
+            check('lastName').exists().isAlpha(),
+            check('emp_depID').isInt()
+        ], (req, res) => {
+            const errors = validationResult(req);
 
-        if (!errors.isEmpty()) {
-            return res.status(422).json({ errors: errors.array() });
-        }
-
-        let employeeId = req.params.id;
-        let firstName = req.body.firstName;
-        let lastName = req.body.lastName;
-        let isActive = req.body.isActive;
-        let emp_depID = req.body.emp_depID;
-        if (!isActive) {
-            isActive = 0;
-        }
-        let updateAttributes = {
-            firstName: firstName,
-            lastName: lastName,
-            isActive: isActive,
-            emp_depID: emp_depID
-        }
-        let options = {
-            where: {
-                id: employeeId
+            if (!errors.isEmpty()) {
+                return res.status(422).json({ errors: errors.array() });
             }
-        }
-        db.employee.update(updateAttributes, options)
-            .then((updatedEmployee) => {
-                res.json(updatedEmployee);
-            });
-    });
+
+            let employeeId = req.params.id;
+            let firstName = req.body.firstName;
+            let lastName = req.body.lastName;
+            let isActive = req.body.isActive;
+            let emp_depID = req.body.emp_depID;
+            if (!isActive) {
+                isActive = 0;
+            }
+            let updateAttributes = {
+                firstName: firstName,
+                lastName: lastName,
+                isActive: isActive,
+                emp_depID: emp_depID
+            }
+            let options = {
+                where: {
+                    id: employeeId
+                }
+            }
+            db.employee.update(updateAttributes, options)
+                .then((updatedEmployee) => {
+                    res.json(updatedEmployee);
+                });
+        });
 
     // DELETE single employee
-    app.delete('/employees/:id', checkIfAuthenticated, (req, res) => {
+    app.delete('/employees/:id', checkIfAuthenticated, jwtAuthz([
+        'create:employees',
+        'delete:employees',
+        'edit:employees'
+    ]), (req, res) => {
         let employeeId = req.params.id;
         db.employee.destroy({
             where: {
@@ -153,6 +165,3 @@ module.exports = (app, db, checkIfAuthenticated) => {
             });
     });
 };
-
-
-

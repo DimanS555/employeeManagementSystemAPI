@@ -8,6 +8,7 @@ let cors = require('cors');
 const env = require('./env');
 const jwt = require('express-jwt');
 const jwksRsa = require('jwks-rsa');
+const jwtAuthz = require('express-jwt-authz');
 
 var app = express();
 
@@ -33,7 +34,7 @@ const checkJwt = jwt({
   algorithms: ['RS256']
 });
 
-router(app, db, checkJwt);
+router(app, db, checkJwt, jwtAuthz);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
