@@ -25,12 +25,12 @@ const checkJwt = jwt({
     cache: true,
     rateLimit: true,
     jwksRequestsPerMinute: 5,
-    jwksUri: 'https://${env.AUTH0_DOMAIN}/.well-known/jwks.json'
+    jwksUri: env.AUTH0_DOMAIN + '.well-known/jwks.json'
   }),
 
   // Validate the audience and the issuer.
   audience: env.AUTH0_AUDIENCE,
-  issuer: 'https://${env.AUTH0_DOMAIN}/',
+  issuer: env.AUTH0_DOMAIN,
   algorithms: ['RS256']
 });
 
