@@ -3,8 +3,8 @@ var routes = [
     require("./routes/departments")
 ];
 
-module.exports = function router(app, db) {
+module.exports = function router(app, db, checkJwt) {
     return routes.forEach((route) => {
-      route(app, db);
+      route(app, db, checkJwt);
     });
 };

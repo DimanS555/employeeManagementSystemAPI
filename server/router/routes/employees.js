@@ -1,8 +1,8 @@
 const { check, validationResult } = require('express-validator/check');
 
-module.exports = (app, db) => {
+module.exports = (app, db, checkIfAuthenticated) => {
     // GET all employees
-    app.get('/employees', (req, res) => {
+    app.get('/employees', checkIfAuthenticated, (req, res) => {
         let pageNo = parseInt(req.query.pageNo, 10);
         let limit = parseInt(req.query.limit, 10);
         if (pageNo < 0 || pageNo === 0) {
@@ -38,7 +38,7 @@ module.exports = (app, db) => {
     });
 
     // POST single employee
-    app.post('/employees', [
+    app.post('/employees', checkIfAuthenticated,[
         check('firstName').exists().isAlpha(),
         check('lastName').exists().isAlpha(),
         check('emp_depID').isInt()
@@ -68,7 +68,7 @@ module.exports = (app, db) => {
     });
 
     // PUT single employee
-    app.put('/employees/:id', [
+    app.put('/employees/:id', checkIfAuthenticated, [
         check('firstName').exists().isAlpha(),
         check('lastName').exists().isAlpha(),
         check('emp_depID').isInt()
@@ -105,7 +105,7 @@ module.exports = (app, db) => {
     });
 
     // DELETE single employee
-    app.delete('/employees/:id', (req, res) => {
+    app.delete('/employees/:id', checkIfAuthenticated, (req, res) => {
         let employeeId = req.params.id;
         db.employee.destroy({
             where: {
@@ -118,7 +118,7 @@ module.exports = (app, db) => {
     });
 
     // GET single employee by id
-    app.get('/employees/:id', (req, res) => {
+    app.get('/employees/:id', checkIfAuthenticated, (req, res) => {
         let employeeId = req.params.id;
         db.employee.find({
             where: {
@@ -131,7 +131,7 @@ module.exports = (app, db) => {
     });
 
     // SEARCH employees by name    
-    app.get('/search', (req, res) => {
+    app.get('/search', checkIfAuthenticated, (req, res) => {
         let query = req.query.name;
         console.log(query.length);
         let empName;

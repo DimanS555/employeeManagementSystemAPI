@@ -5,6 +5,9 @@ let bodyParser = require('body-parser');
 let db = require("./server/config/db");
 let router = require("./server/router/index");
 let cors = require('cors');
+const env = require('./env');
+const jwt = require('express-jwt');
+const jwksRsa = require('jwks-rsa');
 
 var app = express();
 
@@ -15,7 +18,22 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(cors());
 
-router(app, db);
+// Create middleware for checking the JWT
+const checkJwt = jwt({
+  secret: jwksRsa.expressJwtSecret({
+    cache: true,
+    rateLimit: true,
+    jwksRequestsPerMinute: 5,
+    jwksUri: 'https://${env.AUTH0_DOMAIN}/.well-known/jwks.json'
+  }),
+
+  // Validate the audience and the issuer.
+  audience: env.AUTH0_AUDIENCE,
+  issuer: 'https://${env.AUTH0_DOMAIN}/',
+  algorithms: ['RS256']
+});
+
+router(app, db, checkJwt);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
