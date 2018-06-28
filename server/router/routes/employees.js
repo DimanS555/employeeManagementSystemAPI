@@ -1,3 +1,5 @@
+const { check, validationResult } = require('express-validator/check');
+
 module.exports = (app, db) => {
     // GET all employees
     app.get('/employees', (req, res) => {
@@ -36,7 +38,17 @@ module.exports = (app, db) => {
     });
 
     // POST single employee
-    app.post('/employees', (req, res) => {
+    app.post('/employees', [
+        check('firstName').exists().isAlpha(),
+        check('lastName').exists().isAlpha(),
+        check('emp_depID').isInt()
+    ], (req, res) => {
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
+
         let firstName = req.body.firstName;
         let lastName = req.body.lastName;
         let isActive = req.body.isActive;
@@ -56,7 +68,17 @@ module.exports = (app, db) => {
     });
 
     // PUT single employee
-    app.put('/employees/:id', (req, res) => {
+    app.put('/employees/:id', [
+        check('firstName').exists().isAlpha(),
+        check('lastName').exists().isAlpha(),
+        check('emp_depID').isInt()
+    ], (req, res) => {
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
+
         let employeeId = req.params.id;
         let firstName = req.body.firstName;
         let lastName = req.body.lastName;
