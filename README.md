@@ -48,5 +48,5 @@ Once the packages are installed, you can then run the server:
 
 # Test 
 
-To test this application you can run the corresponding SPA application.  For instructions on how to configure and run the SPA app please see the [README.md]().
+To test this application you can run the corresponding SPA application.  For instructions on how to configure and run the SPA app please see the [README.md](https://github.com/DimanS555/employeeManagementSystemSPA/blob/master/README.md).
 Alternatively you can test it using a tool with which you can make HTTP requests (such as Postman) but first of all you need to ask Auth0 for tokens for any of your authorized client applications, perform a POST operation to the https://YOUR-AUTH-DOMAIN/oauth/token  
