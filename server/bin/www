@@ -8,7 +8,8 @@ var app = require('../../index');
 var debug = require('debug')('server:server');
 var db = require("../config/db");
 var http = require('http');
-
+var employeesList = require('../mockData/mockEmployees');
+var departmentsList = require('../mockData/mockDepartments');
 /**
  * Get port from environment and store in Express.
  */
@@ -26,12 +27,23 @@ var server = http.createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 
-db.sequelize.sync().then(()=>{
+db.sequelize.sync({ force: true }).then(() => {
+  db.department.bulkCreate(departmentsList)
+    .then(() => {
+      return db.department.findAll();
+    }).then((data) => {
+      console.log(data);
+    });
+  db.employee.bulkCreate(employeesList)
+    .then(() => {
+      return db.employee.findAll();
+    }).then(data => {
+      console.log(data) // ... in order to get the array of employees
+    });
   server.listen(port);
   server.on('error', onError);
   server.on('listening', onListening);
-}) 
-
+});
 
 /**
  * Normalize a port into a number, string, or false.
